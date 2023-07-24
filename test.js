@@ -1,17 +1,20 @@
 import { Builder, Browser, Origin } from "selenium-webdriver";
 import Chrome from "selenium-webdriver/chrome.js";
 
-const MOVEMENTS = 10;
-const INSTANCES = 1;
-const WIDTH = 1200;
 const HEIGHT = 1200;
+const INSTANCES = 1;
+const MOVEMENTS = 10;
+const SECONDS_BETWEEN_MOVES = 1;
+const WIDTH = 1200;
 
 function newSelenium() {
-  let driver = new Builder()
+  console.log(`width: ${WIDTH}, height: ${HEIGHT}`)
+  const opts = new Chrome.Options().windowSize({ width: WIDTH, height: HEIGHT })
+  //const opts = new Chrome.Options().addArguments(`--window-size=${WIDTH},${HEIGHT}`);
+
+  const driver = new Builder()
     .forBrowser(Browser.CHROME)
-    .setChromeOptions(
-      new Chrome.Options().windowSize({ width: WIDTH, height: HEIGHT })
-    )
+    .setChromeOptions(opts)
     .build();
 
   return driver;
@@ -26,11 +29,11 @@ async function runSelenium(driver) {
 
     for (let n = 0; n < MOVEMENTS; n++) {
       let [x, y] = calculateOffsets(location);
-      console.log(`Moving cursor (x: ${x}, y: ${y})`)
+      console.log(`Moving cursor by offset: {x: ${x}, y: ${y}}, from location: {x: ${location.x}, y: ${location.y}})`)
 
       await actions.move({ x: x, y: y, origin: Origin.POINTER }).perform();
       location = { x: location.x + x, y: location.y + y };
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, SECONDS_BETWEEN_MOVES*1000));
     }
   } finally {
     await driver.quit();
