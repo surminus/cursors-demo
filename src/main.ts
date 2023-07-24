@@ -1,7 +1,7 @@
 import "./style.css";
 import Spaces from "@ably-labs/spaces";
 import { Realtime } from "ably";
-import {nanoid} from 'nanoid';
+import { nanoid } from "nanoid";
 import { generateUsername } from "unique-username-generator";
 
 const client = new Realtime.Promise({
@@ -10,11 +10,13 @@ const client = new Realtime.Promise({
 });
 const spaces = new Spaces(client);
 
-const space = await spaces.get("demoSlideshow", {cursors: {
-  outboundBatchInterval: 100
-}});
+const space = await spaces.get("demoSlideshow", {
+  cursors: {
+    outboundBatchInterval: 100,
+  },
+});
 
-space.enter({username: generateUsername()});
+space.enter({ username: generateUsername() });
 
 // Register a cursor instance
 const demoCursors = space.cursors.get("demoSlideshow-cursors");
@@ -40,7 +42,7 @@ demoCursors.on("cursorUpdate", (update) => {
     .getMembers()
     .find((member) => member.connectionId === update.connectionId);
 
-  console.log({member, self, cursorNode});
+  console.log({ member, self, cursorNode });
 
   if (!member || self?.connectionId === update.connectionId) return;
 
@@ -52,6 +54,10 @@ demoCursors.on("cursorUpdate", (update) => {
   cursorNode.style.left = update.position.x + "px";
   cursorNode.style.top = update.position.y + "px";
 });
+
+function randomColour() {
+  return "#" + (((1 << 24) * Math.random()) | 0).toString(16).padStart(6, "0");
+}
 
 const cursorSvg = (startColor = "#06B6D4", endColor = "#3B82F6", id) => {
   return `
@@ -76,7 +82,8 @@ const createCursor = (
   container.style.transition = "all 50ms ease-out";
 
   const cursor = document.createElement("div");
-  cursor.innerHTML = cursorSvg(undefined, undefined, connectionId);
+  const colour = randomColour();
+  cursor.innerHTML = cursorSvg(colour, colour, connectionId);
 
   container.appendChild(cursor);
 

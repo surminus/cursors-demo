@@ -1,11 +1,10 @@
 import { test, expect, Page } from '@playwright/test';
 
 // Options
-const HEIGHT = 800;
-const WIDTH = 800;
+const HEIGHT = 1200;
+const WIDTH = 1600;
 
-const MOVEMENTS = 100;
-const SECONDS_BETWEEN_MOVES = 1;
+const MOVEMENTS = 20;
 
 const viewportSize = {width: WIDTH, height: HEIGHT};
 
@@ -29,29 +28,33 @@ async function instanceTest(page: Page) {
   console.log("==> Instance started")
   await page.setViewportSize(viewportSize);
 
+  // Pre-flight check that it's booted correctly
   await page.goto('/');
   await expect(page).toHaveTitle(/Cursors/);
 
   for (let i = 0; i < MOVEMENTS; i++) {
-    await page.mouse.move(0, 0);
-    await page.mouse.down();
-    // await page.mouse.move(WIDTH, HEIGHT);
-    await page.mouse.move(10, 0);
-    await page.waitForTimeout(SECONDS_BETWEEN_MOVES*1000);
-    await page.mouse.move(20, 0);
-    await page.waitForTimeout(SECONDS_BETWEEN_MOVES*1000);
-    await page.mouse.move(30, 0);
+    await randomMove(page)
   }
-  // await page.mouse.down();
-  //await page.mouse.move(100, 100);
-  //await page.mouse.move(100, 0);
-  //await page.mouse.move(0, 0);
-  //await page.mouse.up();
   console.log("==> Instance finished")
 }
 
-// humanMove will move the cursor in increments,
-// mimicking the way a human moves the mouse
-async function humanMove(page: Page, width: number, height: number) {
+interface Location {
+  width: number,
+  height: number,
+}
 
+// Randomly move the cursor somewhere within the bounds of the window
+async function randomMove(page: Page) {
+  const targetWidth = randomTarget(WIDTH);
+  const targetHeight = randomTarget(HEIGHT);
+  await page.mouse.move(targetWidth, targetHeight);
+  await page.waitForTimeout(jitter());
 };
+
+function randomTarget(max: number) {
+  return Math.floor(Math.random() * max)
+}
+
+function jitter() {
+  return Math.floor(Math.random() * 2000)
+}
