@@ -1,30 +1,34 @@
 import { test, expect, Page } from '@playwright/test';
 
 // Options
+// Height in pixels of window
 const HEIGHT = 1200;
+// Width in pixels of window
 const WIDTH = 1600;
 
-const MOVEMENTS = 20;
+// Number of seconds to run the test for
+const TIMEOUT = 30;
 
 const viewportSize = {width: WIDTH, height: HEIGHT};
 
 test('default', async ({ context }) => {
+  const now = new Date()
+  const end = now.getTime() + (TIMEOUT * 1000);
+  console.log(`Started at ${now}`)
+
   // How can we programatically generate this?
   await Promise.all([
-    instanceTest(await context.newPage()),
-    instanceTest(await context.newPage()),
-    instanceTest(await context.newPage()),
-    instanceTest(await context.newPage()),
-    instanceTest(await context.newPage()),
-    instanceTest(await context.newPage()),
-    instanceTest(await context.newPage()),
-    instanceTest(await context.newPage()),
-    instanceTest(await context.newPage()),
-    instanceTest(await context.newPage()),
+    instanceTest(await context.newPage(), end),
+    instanceTest(await context.newPage(), end),
+    instanceTest(await context.newPage(), end),
+    instanceTest(await context.newPage(), end),
+    instanceTest(await context.newPage(), end),
   ]);
+
+  console.log(`Finished at ${new Date()}`)
 });
 
-async function instanceTest(page: Page) {
+async function instanceTest(page: Page, end: number) {
   console.log("==> Instance started")
   await page.setViewportSize(viewportSize);
 
@@ -32,9 +36,10 @@ async function instanceTest(page: Page) {
   await page.goto('/');
   await expect(page).toHaveTitle(/Cursors/);
 
-  for (let i = 0; i < MOVEMENTS; i++) {
+  while (new Date().getTime() < end) {
     await randomMove(page)
   }
+
   console.log("==> Instance finished")
 }
 
