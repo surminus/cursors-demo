@@ -18,29 +18,33 @@ test('default', async ({ context }) => {
 
   // How can we programatically generate this?
   await Promise.all([
-    instanceTest(await context.newPage(), end),
-    instanceTest(await context.newPage(), end),
-    instanceTest(await context.newPage(), end),
-    instanceTest(await context.newPage(), end),
-    instanceTest(await context.newPage(), end),
+    instanceTest(0, await context.newPage(), end),
+    // instanceTest(1, await context.newPage(), end),
+    // instanceTest(2, await context.newPage(), end),
+    // instanceTest(3, await context.newPage(), end),
+    // instanceTest(4, await context.newPage(), end),
   ]);
 
   console.log(`Finished at ${new Date()}`)
 });
 
-async function instanceTest(page: Page, end: number) {
-  console.log("==> Instance started")
+async function instanceTest(id: number, page: Page, end: number) {
+  console.log(`Instance ${id} started`)
   await page.setViewportSize(viewportSize);
 
   // Pre-flight check that it's booted correctly
   await page.goto('/');
   await expect(page).toHaveTitle(/Cursors/);
 
+  // Record our movements
+  let movements = 0;
+
   while (new Date().getTime() < end) {
     await randomMove(page)
+    movements++
   }
 
-  console.log("==> Instance finished")
+  console.log(`Instance ${id} finished with ${movements} movements`)
 }
 
 interface Location {
