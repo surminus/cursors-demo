@@ -9,6 +9,9 @@ const WIDTH = 1600;
 // Number of seconds to run the test for
 const TIMEOUT = 30;
 
+// Number of seconds that we randomise jitter to
+const MAX_JITTER = 2;
+
 const viewportSize = {width: WIDTH, height: HEIGHT};
 
 test('default', async ({ context }) => {
@@ -19,10 +22,15 @@ test('default', async ({ context }) => {
   // How can we programatically generate this?
   await Promise.all([
     instanceTest(0, await context.newPage(), end),
-    // instanceTest(1, await context.newPage(), end),
-    // instanceTest(2, await context.newPage(), end),
-    // instanceTest(3, await context.newPage(), end),
-    // instanceTest(4, await context.newPage(), end),
+    instanceTest(1, await context.newPage(), end),
+    instanceTest(2, await context.newPage(), end),
+    instanceTest(3, await context.newPage(), end),
+    instanceTest(4, await context.newPage(), end),
+    instanceTest(5, await context.newPage(), end),
+    instanceTest(6, await context.newPage(), end),
+    instanceTest(7, await context.newPage(), end),
+    instanceTest(8, await context.newPage(), end),
+    instanceTest(9, await context.newPage(), end),
   ]);
 
   console.log(`Finished at ${new Date()}`)
@@ -47,11 +55,6 @@ async function instanceTest(id: number, page: Page, end: number) {
   console.log(`Instance ${id} finished with ${movements} movements`)
 }
 
-interface Location {
-  width: number,
-  height: number,
-}
-
 // Randomly move the cursor somewhere within the bounds of the window
 async function randomMove(page: Page) {
   const targetWidth = randomTarget(WIDTH);
@@ -65,5 +68,5 @@ function randomTarget(max: number) {
 }
 
 function jitter() {
-  return Math.floor(Math.random() * 2000)
+  return Math.floor(Math.random() * (MAX_JITTER*1000))
 }
