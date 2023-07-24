@@ -14,6 +14,9 @@
   },
   "dependencies": {
     "@ably-labs/spaces": "^0.0.10",
-    "ably": "^1.2.41"
+    "ably": "^1.2.41",
+    "nanoid": "^4.0.2",
+    "selenium-webdriver": "^4.10.0",
+    "unique-username-generator": "^1.1.3"
   }
 }

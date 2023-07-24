@@ -1,10 +1,12 @@
 import "./style.css";
 import Spaces from "@ably-labs/spaces";
 import { Realtime } from "ably";
+import {nanoid} from 'nanoid';
+import { generateUsername } from "unique-username-generator";
 
 const client = new Realtime.Promise({
   key: import.meta.env.VITE_ABLY_API_KEY,
-  clientId: "howdy",
+  clientId: nanoid(),
 });
 const spaces = new Spaces(client);
 
@@ -12,10 +14,7 @@ const space = await spaces.get("demoSlideshow", {cursors: {
   outboundBatchInterval: 100
 }});
 
-space.enter({
-  username: 'Claire Lemons',
-  avatar: 'https://slides-internal.com/users/clemons.png',
-});
+space.enter({username: generateUsername()});
 
 // Register a cursor instance
 const demoCursors = space.cursors.get("demoSlideshow-cursors");
