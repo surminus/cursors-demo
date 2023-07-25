@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page } from "@playwright/test";
 
 // Options
 // Height in pixels of window
@@ -15,12 +15,12 @@ const MAX_JITTER = 2;
 // Number of increments between mouse moves to simulate human actions
 const INCREMENTS = 20;
 
-const viewportSize = {width: WIDTH, height: HEIGHT};
+const viewportSize = { width: WIDTH, height: HEIGHT };
 
-test('default', async ({ context }) => {
-  const now = new Date()
-  const end = now.getTime() + (TIMEOUT * 1000);
-  console.log(`Started at ${now}`)
+test("default", async ({ context }) => {
+  const now = new Date();
+  const end = now.getTime() + TIMEOUT * 1000;
+  console.log(`Started at ${now}`);
 
   // How can we programatically generate this?
   await Promise.all([
@@ -36,15 +36,15 @@ test('default', async ({ context }) => {
     instanceTest(9, await context.newPage(), end),
   ]);
 
-  console.log(`Finished at ${new Date()}`)
+  console.log(`Finished at ${new Date()}`);
 });
 
 async function instanceTest(id: number, page: Page, end: number) {
-  console.log(`Instance ${id} started`)
+  console.log(`Instance ${id} started`);
   await page.setViewportSize(viewportSize);
 
   // Pre-flight check that it's booted correctly
-  await page.goto('/');
+  await page.goto("/");
   await expect(page).toHaveTitle(/Cursors/);
 
   // Record our movements
@@ -53,24 +53,24 @@ async function instanceTest(id: number, page: Page, end: number) {
   let start = newLocation();
   while (new Date().getTime() < end) {
     let end = newLocation();
-    await incrementalMove(page, start, end)
-    movements++
-    start = end
+    await incrementalMove(page, start, end);
+    movements++;
+    start = end;
   }
 
-  console.log(`Instance ${id} finished with ${movements} movements`)
+  console.log(`Instance ${id} finished with ${movements} movements`);
 }
 
 interface Location {
-  height: number,
-  width: number
+  height: number;
+  width: number;
 }
 
-function newLocation() : Location {
+function newLocation(): Location {
   return {
     height: randomTarget(HEIGHT),
-    width: randomTarget(WIDTH)
-  }
+    width: randomTarget(WIDTH),
+  };
 }
 
 async function incrementalMove(page: Page, start: Location, end: Location) {
@@ -88,16 +88,16 @@ async function incrementalMove(page: Page, start: Location, end: Location) {
   await page.mouse.move(end.width, end.height);
 
   await page.waitForTimeout(jitter());
-};
+}
 
-function calcincrements(start: number, end: number) : number {
-  return Math.floor((end - start) / INCREMENTS)
+function calcincrements(start: number, end: number): number {
+  return Math.floor((end - start) / INCREMENTS);
 }
 
 function randomTarget(max: number) {
-  return Math.floor(Math.random() * max)
+  return Math.floor(Math.random() * max);
 }
 
 function jitter() {
-  return Math.floor(Math.random() * (MAX_JITTER*1000))
+  return Math.floor(Math.random() * (MAX_JITTER * 1000));
 }
