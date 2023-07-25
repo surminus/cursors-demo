@@ -1,13 +1,17 @@
-import { test, expect, Page } from "@playwright/test";
+import { test, expect, Page, BrowserContext } from "@playwright/test";
 
 // Options
+// The number of simultaneous cursor moves. Each instance is a separate
+// page.
+const INSTANCES = 5;
+
 // Height in pixels of window
 const HEIGHT = 1200;
 // Width in pixels of window
 const WIDTH = 1600;
 
 // Number of seconds to run the test for
-const TIMEOUT = 30;
+const TIMEOUT = 10;
 
 // Number of seconds that we randomise jitter to between moves
 const MAX_JITTER = 2;
@@ -22,24 +26,16 @@ test("default", async ({ context }) => {
   const end = now.getTime() + TIMEOUT * 1000;
   console.log(`Started at ${now}`);
 
-  // How can we programatically generate this?
-  await Promise.all([
-    instanceTest(0, await context.newPage(), end),
-    instanceTest(1, await context.newPage(), end),
-    instanceTest(2, await context.newPage(), end),
-    instanceTest(3, await context.newPage(), end),
-    instanceTest(4, await context.newPage(), end),
-    instanceTest(5, await context.newPage(), end),
-    instanceTest(6, await context.newPage(), end),
-    instanceTest(7, await context.newPage(), end),
-    instanceTest(8, await context.newPage(), end),
-    instanceTest(9, await context.newPage(), end),
-  ]);
+  await Promise.all(
+    Array.from(Array(INSTANCES)).map((_, i) => instanceTest(i, context, end))
+  );
 
   console.log(`Finished at ${new Date()}`);
 });
 
-async function instanceTest(id: number, page: Page, end: number) {
+async function instanceTest(id: number, context: BrowserContext, end: number) {
+  const page = await context.newPage();
+
   console.log(`Instance ${id} started`);
   await page.setViewportSize(viewportSize);
 
@@ -58,7 +54,9 @@ async function instanceTest(id: number, page: Page, end: number) {
     start = end;
   }
 
-  console.log(`Instance ${id} finished with ${movements} movements`);
+  console.log(
+    `Instance ${id} finished with ${movements * INCREMENTS} movements`
+  );
 }
 
 interface Location {
@@ -85,7 +83,6 @@ async function incrementalMove(page: Page, start: Location, end: Location) {
     await page.mouse.move(width, height);
     await page.waitForTimeout(Math.floor(500 / INCREMENTS));
   }
-  await page.mouse.move(end.width, end.height);
 
   await page.waitForTimeout(jitter());
 }
