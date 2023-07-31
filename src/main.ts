@@ -1,5 +1,5 @@
 import "./style.css";
-import Spaces from "@ably-labs/spaces";
+import Spaces from "../../../ably/spaces/src/Spaces"
 import { Realtime } from "ably";
 import { nanoid } from "nanoid";
 import { generateUsername } from "unique-username-generator";
@@ -10,27 +10,20 @@ const client = new Realtime.Promise({
 });
 const spaces = new Spaces(client);
 
-const space = await spaces.get("demoSlideshow", {
-  cursors: {
-    outboundBatchInterval: 100,
-  },
-});
+const space = await spaces.get("demo");
 
 space.enter({ username: generateUsername() });
 
-// Register a cursor instance
-const demoCursors = space.cursors.get("demoSlideshow-cursors");
-
 // Publish a CursorUpdate with the location of a mouse, including optional data for the current member
 window.addEventListener("mousemove", ({ clientX, clientY }) => {
-  demoCursors.set({
+  space.cursors.set({
     position: { x: clientX, y: clientY },
     data: { color: "red" },
   });
 });
 
 // Listen to events published on "mousemove" by all members
-demoCursors.on("cursorUpdate", (update) => {
+space.cursors.subscribe("cursorsUpdate", (update) => {
   console.log(update);
   const self = space.getSelf();
 
