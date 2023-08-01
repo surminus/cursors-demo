@@ -8,6 +8,7 @@ import { generateUsername } from "unique-username-generator";
 
 const client = new Realtime.Promise({
   key: import.meta.env.VITE_ABLY_API_KEY,
+  environment: import.meta.env.VITE_ABLY_ENV,
   clientId: nanoid(),
 });
 const spaces = new Spaces(client);
