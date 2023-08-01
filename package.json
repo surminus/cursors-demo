@@ -15,7 +15,7 @@
     "vite": "^4.4.0"
   },
   "dependencies": {
-    "@ably-labs/spaces": "^0.0.10",
+    "@ably-labs/spaces": "^0.0.12",
     "ably": "^1.2.42",
     "nanoid": "^4.0.2",
     "selenium-webdriver": "^4.10.0",
