@@ -15,23 +15,28 @@ const SQUARES = 10;
 
 const SQUARE_SIZE = 600;
 
-// Number of seconds that we randomise jitter to between moves
-const MAX_JITTER = 2;
-
 const viewportSize = { width: WIDTH, height: HEIGHT };
 
 test("default", async ({ context }) => {
   const now = new Date();
   console.log(`Started at ${now}`);
 
+  let start = 0;
   await Promise.all(
-    Array.from(Array(parseInt(MEMBERS))).map((_, i) => instanceTest(i, context))
+    Array.from(Array(parseInt(MEMBERS))).map((_, i) => {
+      start += 100;
+      return instanceTest(i, context, { x: start, y: start });
+    })
   );
 
   console.log(`Finished at ${new Date()}`);
 });
 
-async function instanceTest(id: number, context: BrowserContext) {
+async function instanceTest(
+  id: number,
+  context: BrowserContext,
+  start: { x: number; y: number }
+) {
   const page = await context.newPage();
 
   console.log(`Instance ${id} started`);
@@ -42,43 +47,23 @@ async function instanceTest(id: number, context: BrowserContext) {
   await expect(page).toHaveTitle(/Cursors/);
 
   for (let i = 0; i < SQUARES; i++) {
-    await square(page, SQUARE_SIZE);
+    await square(page, start, SQUARE_SIZE);
   }
 
-  console.log(
-    `Instance ${id} finished`
-  );
+  console.log(`Instance ${id} finished`);
 }
 
-async function square(page: Page, size: number = 500, steps: number = 100) {
-  await page.mouse.move(0, 0, {steps: 0});
-  await page.mouse.move(0, size, {steps});
-  await page.mouse.move(size, size, {steps});
-  await page.mouse.move(size, 0, {steps});
-  await page.mouse.move(0, 0, {steps});
+async function square(
+  page: Page,
+  start: { x: number; y: number },
+  size: number = 500,
+  steps: number = 100
+) {
+  await page.mouse.move(start.x, start.y, { steps: 0 });
+  await page.mouse.move(start.x, start.y + size, { steps });
+  await page.mouse.move(start.x + size, start.y + size, { steps });
+  await page.mouse.move(start.x + size, start.y, { steps });
+  await page.mouse.move(start.x, start.y, { steps });
 }
 
-interface Location {
-  x: number;
-  y: number;
-}
-
-function newLocation(): Location {
-  return {
-    x: randomTarget(HEIGHT),
-    y: randomTarget(WIDTH),
-  };
-}
-
-async function move(page: Page, location: Location, steps: number = 100) {
-  await page.mouse.move(location.x, location.y, {steps});
-  await page.waitForTimeout(jitter());
-}
-
-function randomTarget(max: number) {
-  return Math.floor(Math.random() * max);
-}
-
-function jitter() {
-  return Math.floor(Math.random() * (MAX_JITTER * 1000));
-}
+async function circle() {}

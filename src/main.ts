@@ -1,5 +1,8 @@
 import "./style.css";
+
+// Update to local reference
 import Spaces from "../../../ably/spaces/src/Spaces"
+
 import { Realtime } from "ably";
 import { nanoid } from "nanoid";
 import { generateUsername } from "unique-username-generator";
